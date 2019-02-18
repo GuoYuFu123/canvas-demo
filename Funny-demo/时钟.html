@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Canvas时钟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #cas {
+            display: block;
+            border: 1px solid #000;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="cas" width='500' height="500"></canvas>
+</body>
+<script>
+    /*
+        @author : guoguo
+        @date: 2019.2.18
+        */
+    window.onload = function () {
+        var canvas = document.getElementById('cas');
+        var context = canvas.getContext('2d'); 
+        var RADIUS = 100;
+        drawClock();
+        setInterval(function () {
+            context.clearRect(0,0,canvas.width,canvas.height)
+            drawClock();
+        }, 1000) 
+    
+        function drawCircle() {        
+            context.beginPath(); //起始一条路径，或重置当前路径
+            context.arc(canvas.width / 2 , canvas.height / 2, RADIUS, 0 , Math.PI * 2 , true);
+            context.stroke() //绘制已定义的路径
+            context.save(); //保存当前环境的状态
+            context.beginPath();
+            context.arc(canvas.width / 2, canvas.height / 2, 5, 0 , Math.PI * 2, true)
+            context.fill(); //填充当前绘图（路径）[内部填充]
+            
+        }
+        function drawtext() {
+            var num = [3,4,5,6,7,8,9,10,11,12,1,2];
+            for (var i = 0; i < num.length; i ++) {
+                context.font = '18px 微软雅黑';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                var textangle = i * Math.PI / 6 
+                context.fillText(num[i], canvas.width / 2 + (RADIUS-15) * Math.cos(textangle) , canvas.width / 2 +  (RADIUS - 15) * Math.sin(textangle))
+            }
+        }
+        function drawPointer() {
+            var date = new Date();
+            var h = (date.getHours() >= 12 ? date.getHours() - 12 : date.getHours())
+            var m = date.getMinutes();
+            var s = date.getSeconds()
+            //获取角度
+            var h_angle = getAngle(h * Math.PI /6 + Math.PI /6 * m / 60)
+            var m_angle = getAngle(m / 30 * Math.PI + Math.PI / 30 * s / 60)
+            var s_angle = getAngle(s / 30 * Math.PI)
+            drawLine(canvas.width / 2, canvas.width / 2 , canvas.width / 2 + RADIUS * 0.4 * Math.cos(h_angle) , canvas.width / 2 + RADIUS * 0.4 * Math.sin(h_angle))
+            drawLine(canvas.width / 2, canvas.width / 2, canvas.width / 2 + RADIUS * 0.6 * Math.cos(m_angle), canvas.width / 2 + RADIUS * 0.6 * Math.sin(m_angle))
+            drawLine(canvas.width / 2, canvas.width / 2, canvas.width / 2 + RADIUS * 0.7 * Math.cos(s_angle), canvas.width / 2 + RADIUS * 0.7 * Math.sin(s_angle))
+        }
+        function getAngle(angle) { 
+            if(angle <= 1.5*Math.PI){
+                return angle - 0.5 * Math.PI 
+            }
+            else {
+                return angle - 2.5 * Math.PI 
+            }
+            
+        }
+        function drawLine(intx,inty,endx,endy) {
+            context.moveTo(intx, inty);
+            context.lineTo(endx, endy);
+            context.stroke();
+        }
+        function drawClock() {
+                drawCircle();
+                drawtext();
+                drawPointer()
+        }
+    }
+</script>
+</html>
